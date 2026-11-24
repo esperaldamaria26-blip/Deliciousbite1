@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deliciousbite — Artisanal Bakery & Cafe Prototype</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Playfair Display untuk kesan mewah & Plus Jakarta Sans untuk keterbacaan modern -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                    },
+                    colors: {
+                        vanilla: {
+                            50: '#FDFBF7',
+                            100: '#FAF5EB',
+                            200: '#F4EBD9',
+                        },
+                        butter: {
+                            100: '#FEF5D4',
+                            200: '#FDE9A2',
+                            300: '#F9DC78',
+                            400: '#F3CB4E',
+                        },
+                        caramel: {
+                            400: '#D69A54',
+                            500: '#C4823B',
+                            600: '#A66829',
+                        },
+                        mocha: {
+                            600: '#6E4E3D',
+                            700: '#543A2C',
+                            800: '#3D291E',
+                            900: '#291B13',
+                        },
+                        burgundy: {
+                            100: '#F3E5E7',
+                            200: '#E5C6CB',
+                            300: '#CFA0A8',
+                            400: '#B57B85',
+                            500: '#9A5B66',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Menyembunyikan scrollbar agar tampilan di dalam bingkai HP terlihat bersih seperti aplikasi native */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-vanilla-200/70 text-mocha-900 font-sans antialiased selection:bg-butter-300 selection:text-mocha-900 min-h-screen flex flex-col">
+
+    <!-- ==================== DEVELOPER TOOLBAR (EXPORT & PREVIEW) ==================== -->
+    <div class="bg-mocha-900 text-vanilla-100 px-4 py-2.5 text-xs sm:text-sm sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-butter-400 animate-pulse"></span>
+                <span class="font-semibold tracking-wide text-butter-200">MOBILE APP VIEW</span>
+                <span class="hidden sm:inline text-vanilla-200/70">| Deliciousbite Mobile v1.0</span>
+            </div>
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Tombol Toggle Desktop / Mobile Frame -->
+                <button onclick="toggleMobileSimulation()" id="btn-mobile-sim" class="flex items-center gap-1.5 bg-mocha-800 hover:bg-mocha-700 text-butter-200 px-3 py-1.5 rounded-lg border border-mocha-700 transition cursor-pointer">
+                    <i data-lucide="monitor" class="w-4 h-4"></i>
+                    <span>Buka Layar Penuh Desktop</span>
+                </button>
+                <!-- Tombol Download ke Word -->
+                <button onclick="exportToWord()" class="flex items-center gap-1.5 bg-burgundy-500 hover:bg-burgundy-400 text-white font-medium px-3.5 py-1.5 rounded-lg shadow transition cursor-pointer">
+                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                    <span>Unduh ke Word (.doc)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container Utama: Default langsung tampil dalam bingkai Handphone (412px) -->
+    <div id="app-wrapper" class="transition-all duration-300 mx-auto w-full max-w-[412px] sm:my-6 sm:rounded-[44px] sm:border-[12px] sm:border-mocha-900 sm:shadow-2xl bg-vanilla-50 relative flex flex-col h-[calc(100vh-44px)] sm:h-[820px] overflow-hidden">
+
+        <!-- ==================== MOBILE STATUS BAR (REALISTIC PHONE UI) ==================== -->
+        <div id="mobile-status-bar" class="bg-vanilla-50 px-6 pt-3 pb-1 flex items-center justify-between text-[11px] font-bold text-mocha-900 select-none shrink-0">
+            <span>09:41</span>
+            <!-- Dynamic Island / Notch -->
+            <div class="w-24 h-5 bg-mocha-900 rounded-full flex items-center justify-end px-2">
+                <div class="w-2 h-2 rounded-full bg-mocha-700"></div>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <i data-lucide="signal" class="w-3.5 h-3.5"></i>
+                <i data-lucide="wifi" class="w-3.5 h-3.5"></i>
+                <i data-lucide="battery-charging" class="w-4 h-4"></i>
+            </div>
+        </div>
+
+        <!-- ==================== TOP NAVIGATION (APP HEADER) ==================== -->
+        <header class="sticky top-0 z-30 bg-vanilla-50/95 backdrop-blur-md border-b border-vanilla-200 shrink-0">
+            <div class="px-4 h-16 flex items-center justify-between">
+                <!-- Brand Logo -->
+                <a href="#" onclick="switchTab('home')" class="flex items-center gap-2 group">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-butter-300 to-caramel-400 flex items-center justify-center text-mocha-900 shadow-sm">
+                        <i data-lucide="croissant" class="w-5 h-5 text-mocha-900"></i>
+                    </div>
+                    <div>
+                        <span class="font-serif text-lg font-bold text-mocha-900 tracking-tight">Delicious<span class="text-caramel-500">bite</span></span>
+                        <p class="text-[9px] uppercase tracking-widest text-burgundy-500 font-semibold -mt-1">Artisanal Bakery</p>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation Links (Hanya muncul jika mode desktop diaktifkan) -->
+                <nav id="desktop-nav-links" class="hidden items-center gap-8 font-medium text-sm text-mocha-700">
+                    <button onclick="switchTab('home')" class="nav-link text-mocha-900 font-bold border-b-2 border-caramel-500 pb-1 transition" data-target="home">Beranda</button>
+                    <button onclick="switchTab('menu')" class="nav-link hover:text-caramel-500 pb-1 transition" data-target="menu">Menu & Harga</button>
+                    <button onclick="switchTab('profile')" class="nav-link hover:text-caramel-500 pb-1 transition" data-target="profile">Profil Saya</button>
+                </nav>
+
+                <!-- Action Buttons (Cart & Login) -->
+                <div class="flex items-center gap-2">
+                    <!-- Keranjang Button -->
+                    <button onclick="switchTab('checkout')" class="relative p-2 rounded-xl bg-butter-100 hover:bg-butter-200 text-mocha-800 transition cursor-pointer">
+                        <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                        <span id="cart-badge" class="absolute -top-1 -right-1 bg-burgundy-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow">2</span>
+                    </button>
+
+                    <!-- Auth Status / Login Button -->
+                    <button id="auth-header-btn" onclick="openAuthModal()" class="flex items-center gap-1.5 bg-mocha-800 hover:bg-mocha-900 text-vanilla-50 text-xs font-semibold px-3 py-2 rounded-xl shadow-sm transition cursor-pointer">
+                        <i data-lucide="user" class="w-3.5 h-3.5 text-butter-300"></i>
+                        <span id="auth-header-text">Masuk</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ==================== MAIN CONTENT AREA (SCROLLABLE IN PHONE) ==================== -->
+        <main id="mobile-scroll-area" class="flex-1 overflow-y-auto no-scrollbar px-4 py-5 pb-36 space-y-6">
+
+            <!-- 1. HALAMAN BERANDA (HOME) -->
+            <section id="tab-home" class="tab-content space-y-6">
+                <!-- Hero Banner Mobile-First -->
+                <div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-butter-200 via-vanilla-100 to-burgundy-100 border border-butter-300/60 p-5 shadow-sm">
+                    <div id="hero-grid" class="grid grid-cols-1 gap-5 items-center">
+                        <div id="hero-text-col" class="space-y-3">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-burgundy-200/80 text-mocha-900 text-[11px] font-semibold">
+                                <i data-lucide="sparkles" class="w-3 h-3 text-burgundy-500"></i>
+                                Dipanggang Segar Setiap Pagi
+                            </span>
+                            <h1 class="font-serif text-2xl font-bold text-mocha-900 leading-snug">
+                                Kehangatan <span class="text-caramel-500 italic">Caramel</span> & Lembutnya <span class="text-burgundy-500">Vanilla</span>.
+                            </h1>
+                            <p class="text-mocha-700 text-xs leading-relaxed">
+                                Roti dengan banyak pilihan rasa, dan hidangan penutup premium dengan mentega murni.
+                                Dilengkapi dengan minuman kesukaan kamu.
+                            </p>
+                            
+                        </div>
+
+                        <!-- Hero Visual Card -->
+                        <div id="hero-img-col" class="relative">
+                            <div class="relative rounded-2xl overflow-hidden shadow-md border-2 border-white aspect-[16/10] bg-butter-100">
+                                <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80" 
+                                     onerror="this.src='https://placehold.co/800x500/FDE9A2/3D291E?text=Deliciousbite+Pastry'" 
+                                     alt="Artisanal Croissant" class="w-full h-full object-cover">
+                                <div class="absolute bottom-2.5 left-2.5 right-2.5 bg-vanilla-50/95 backdrop-blur-md p-2.5 rounded-xl border border-butter-200 flex items-center justify-between">
+                                    <div>
+                                        <p class="text-[10px] text-burgundy-500 font-bold">Terlaris Minggu Ini</p>
+                                        <p class="font-serif text-xs font-bold text-mocha-900">Salted Caramel Croissant</p>
+                                    </div>
+                                    <span class="bg-butter-300 text-mocha-900 font-bold text-[11px] px-2.5 py-1 rounded-lg">Rp 38rb</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Keunggulan / Highlights Horizontal Scroll di HP -->
+                <div id="highlights-grid" class="grid grid-cols-1 gap-3">
+                    <div class="bg-white p-4 rounded-2xl border border-vanilla-200 shadow-sm flex items-center gap-3.5">
+                        <div class="p-2.5 rounded-xl bg-butter-100 text-caramel-600 shrink-0">
+                            <i data-lucide="award" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-xs text-mocha-900">100% Mentega Prancis Asli</h3>
+                            <p class="text-[11px] text-mocha-600 mt-0.5">Tekstur renyah berlapis dan lembut di dalam.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-vanilla-200 shadow-sm flex items-center gap-3.5">
+                        <div class="p-2.5 rounded-xl bg-burgundy-100 text-burgundy-500 shrink-0">
+                            <i data-lucide="clock" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-xs text-mocha-900">Antar Hangat < 45 Menit</h3>
+                            <p class="text-[11px] text-mocha-600 mt-0.5">Dikemas khusus menjaga kesegaran dari oven.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview Menu Favorit di Beranda -->
+                <div class="space-y-3.5">
+                    <div class="flex items-end justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-burgundy-500">Rekomendasi Chef</span>
+                            <h2 class="font-serif text-xl font-bold text-mocha-900">Sajian Spesial Hari Ini</h2>
+                        </div>
+                        <button onclick="switchTab('menu')" class="text-xs font-semibold text-caramel-600 hover:text-mocha-900 flex items-center gap-0.5 cursor-pointer">
+                            <span>Semua</span>
+                            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                    <div id="featured-menu-grid" class="grid grid-cols-1 gap-4">
+                        <!-- Diisi otomatis via JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. HALAMAN KATALOG MENU & HARGA -->
+            <section id="tab-menu" class="tab-content hidden space-y-5">
+                <div class="bg-butter-100/80 rounded-2xl p-4 border border-butter-200 space-y-3">
+                    <div>
+                        <h1 class="font-serif text-xl font-bold text-mocha-900">Menu & Daftar Harga</h1>
+                        <p class="text-xs text-mocha-700 mt-0.5">Pilih sajian artisan favorit Anda.</p>
+                    </div>
+                    <!-- Filter Kategori Horizontal Scroll -->
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1" id="category-filters">
+                        <button onclick="filterMenu('all', this)" class="filter-btn shrink-0 bg-mocha-800 text-butter-200 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer">Semua</button>
+                        <button onclick="filterMenu('pastry', this)" class="filter-btn shrink-0 bg-white text-mocha-700 hover:bg-butter-200 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer">Pastry</button>
+                        <button onclick="filterMenu('dessert', this)" class="filter-btn shrink-0 bg-white text-mocha-700 hover:bg-butter-200 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer">Dessert</button>
+                        <button onclick="filterMenu('drink', this)" class="filter-btn shrink-0 bg-white text-mocha-700 hover:bg-butter-200 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer">Mocha & Kopi</button>
+                    </div>
+                </div>
+
+                <!-- Grid Semua Menu -->
+                <div id="all-menu-grid" class="grid grid-cols-1 gap-4">
+                    <!-- Diisi otomatis via JavaScript -->
+                </div>
+            </section>
+
+            <!-- 3. HALAMAN PEMBAYARAN & KERANJANG (CHECKOUT) -->
+            <section id="tab-checkout" class="tab-content hidden space-y-5">
+                <div class="flex items-center gap-3">
+                    <button onclick="switchTab('menu')" class="p-2 rounded-xl bg-white border border-vanilla-200 text-mocha-800 hover:bg-butter-100 transition cursor-pointer shrink-0">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    </button>
+                    <div>
+                        <h1 class="font-serif text-xl font-bold text-mocha-900">Keranjang & Pembayaran</h1>
+                        <p class="text-xs text-mocha-700 mt-0.5">Periksa pesanan Anda sebelum membayar.</p>
+                    </div>
+                </div>
+
+                <div id="checkout-layout-grid" class="grid grid-cols-1 gap-5">
+                    <!-- Daftar Item di Keranjang -->
+                    <div class="space-y-4">
+                        <div class="bg-white rounded-2xl p-4 border border-vanilla-200 shadow-sm space-y-3">
+                            <div class="flex items-center justify-between border-b border-vanilla-200 pb-3">
+                                <h2 class="font-bold text-sm text-mocha-900 flex items-center gap-1.5">
+                                    <i data-lucide="shopping-bag" class="w-4 h-4 text-caramel-500"></i>
+                                    <span>Item Pesanan</span>
+                                </h2>
+                                <button onclick="switchTab('menu')" class="text-[11px] font-semibold text-burgundy-500 hover:underline cursor-pointer">+ Tambah Menu</button>
+                            </div>
+                            
+                            <div id="cart-items-container" class="space-y-3">
+                                <!-- Diisi otomatis via JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Alamat Pengiriman -->
+                        <div class="bg-white rounded-2xl p-4 border border-vanilla-200 shadow-sm space-y-3">
+                            <h2 class="font-bold text-sm text-mocha-900 flex items-center gap-1.5">
+                                <i data-lucide="map-pin" class="w-4 h-4 text-burgundy-500"></i>
+                                <span>Alamat Pengiriman</span>
+                            </h2>
+                            <div class="space-y-2.5 text-xs">
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-mocha-600 mb-1">Nama Penerima</label>
+                                    <input type="text" id="checkout-name" value="Nadia Maharani" class="w-full px-3 py-2 rounded-xl bg-vanilla-50 border border-vanilla-200 focus:outline-none focus:border-caramel-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-mocha-600 mb-1">Nomor Telepon</label>
+                                    <input type="text" value="0812-3456-7890" class="w-full px-3 py-2 rounded-xl bg-vanilla-50 border border-vanilla-200 focus:outline-none focus:border-caramel-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-mocha-600 mb-1">Alamat Lengkap</label>
+                                    <textarea rows="2" class="w-full px-3 py-2 rounded-xl bg-vanilla-50 border border-vanilla-200 focus:outline-none focus:border-caramel-500">Jl. Senopati No. 88, Kebayoran Baru, Jakarta Selatan</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ringkasan Harga & Metode Pembayaran -->
+                    <div class="space-y-4">
+                        <div class="bg-vanilla-100 rounded-2xl p-4 border border-butter-300/60 shadow-sm space-y-4">
+                            <h2 class="font-serif text-base font-bold text-mocha-900">Metode & Ringkasan Bayar</h2>
+                            
+                            <!-- Pilih Metode Pembayaran -->
+                            <div class="space-y-2">
+                                <label class="flex items-center justify-between p-3 rounded-xl bg-white border-2 border-caramel-500 cursor-pointer">
+                                    <div class="flex items-center gap-2.5">
+                                        <input type="radio" name="payment_method" value="QRIS Instant" checked class="accent-mocha-800 w-3.5 h-3.5">
+                                        <div>
+                                            <p class="text-xs font-bold text-mocha-900">QRIS (GoPay, OVO, Dana)</p>
+                                            <p class="text-[10px] text-mocha-600">Otomatis & bebas biaya admin</p>
+                                        </div>
+                                    </div>
+                                    <span class="px-2 py-0.5 bg-butter-200 text-mocha-900 text-[9px] font-bold rounded-md">INSTAN</span>
+                                </label>
+
+                                <label class="flex items-center justify-between p-3 rounded-xl bg-white border border-vanilla-200 cursor-pointer">
+                                    <div class="flex items-center gap-2.5">
+                                        <input type="radio" name="payment_method" value="Virtual Account" class="accent-mocha-800 w-3.5 h-3.5">
+                                        <div>
+                                            <p class="text-xs font-bold text-mocha-900">Virtual Account Bank</p>
+                                            <p class="text-[10px] text-mocha-600">BCA, Mandiri, BNI, BRI</p>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-center justify-between p-3 rounded-xl bg-white border border-vanilla-200 cursor-pointer">
+                                    <div class="flex items-center gap-2.5">
+                                        <input type="radio" name="payment_method" value="Kartu Kredit / Debit" class="accent-mocha-800 w-3.5 h-3.5">
+                                        <div>
+                                            <p class="text-xs font-bold text-mocha-900">Kartu Kredit / Debit</p>
+                                            <p class="text-[10px] text-mocha-600">Visa & Mastercard</p>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Rincian Biaya -->
+                            <div class="border-t border-caramel-400/30 pt-3 space-y-1.5 text-xs">
+                                <div class="flex justify-between text-mocha-700">
+                                    <span>Subtotal Produk</span>
+                                    <span id="summary-subtotal" class="font-semibold">Rp 0</span>
+                                </div>
+                                <div class="flex justify-between text-mocha-700">
+                                    <span>Biaya Pengiriman</span>
+                                    <span id="summary-shipping" class="font-semibold">Rp 12.000</span>
+                                </div>
+                                <div class="flex justify-between text-burgundy-500">
+                                    <span>Diskon Member Butter</span>
+                                    <span id="summary-discount" class="font-semibold">- Rp 10.000</span>
+                                </div>
+                                <div class="flex justify-between text-sm font-bold text-mocha-900 border-t border-caramel-400/30 pt-2.5">
+                                    <span>Total Bayar</span>
+                                    <span id="summary-total" class="text-base text-caramel-600">Rp 0</span>
+                                </div>
+                            </div>
+
+                            <button onclick="processPayment()" class="w-full bg-mocha-800 hover:bg-mocha-900 text-butter-200 text-xs font-bold py-3.5 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+                                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                                <span>Bayar Sekarang</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. HALAMAN PROFIL PENGGUNA (PROFILE) -->
+            <section id="tab-profile" class="tab-content hidden space-y-5">
+                <div class="bg-gradient-to-br from-mocha-800 to-mocha-900 rounded-3xl p-5 text-vanilla-50 relative overflow-hidden">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-2xl bg-butter-300 text-mocha-900 flex items-center justify-center font-serif text-xl font-bold border-2 border-vanilla-100 shadow shrink-0">
+                            NM
+                        </div>
+                        <div class="space-y-1 flex-1 min-w-0">
+                            <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-burgundy-500 text-white text-[10px] font-semibold">
+                                <i data-lucide="crown" class="w-3 h-3"></i>
+                                <span>Gold Butter Member</span>
+                            </div>
+                            <h1 id="profile-display-name" class="font-serif text-lg font-bold truncate">Nadia Maharani</h1>
+                            <p id="profile-display-email" class="text-[11px] text-vanilla-200/80 truncate">nadia.maharani@email.com</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-mocha-700 flex items-center justify-between text-xs">
+                        <span class="text-butter-200">Poin Loyalti Anda</span>
+                        <span class="font-bold text-butter-300 text-sm">1.450 pts</span>
+                    </div>
+                </div>
+
+                <!-- Edit Informasi Profil -->
+                <div class="bg-white rounded-2xl p-4 border border-vanilla-200 shadow-sm space-y-3">
+                    <h2 class="font-serif text-base font-bold text-mocha-900">Pengaturan Akun</h2>
+                    <div class="space-y-2.5 text-xs">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-mocha-600 mb-1">Nama Lengkap</label>
+                            <input type="text" id="profile-input-name" value="Nadia Maharani" class="w-full px-3 py-2 rounded-xl bg-vanilla-50 border border-vanilla-200">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-mocha-600 mb-1">Alamat Email</label>
+                            <input type="email" id="profile-input-email" value="nadia.maharani@email.com" class="w-full px-3 py-2 rounded-xl bg-vanilla-50 border border-vanilla-200">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-mocha-600 mb-1">Preferensi Rasa</label>
+                            <select class="w-full px-3 py-2 rounded-xl bg-vanilla-50 border border-vanilla-200">
+                                <option>Salted Caramel & Butter</option>
+                                <option>Dark Mocha & Espresso</option>
+                                <option>Madagascar Vanilla</option>
+                            </select>
+                        </div>
+                        <button onclick="saveProfile()" class="w-full bg-caramel-500 hover:bg-caramel-600 text-white font-semibold py-2.5 rounded-xl transition cursor-pointer">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Riwayat Pesanan Terakhir -->
+                <div class="bg-white rounded-2xl p-4 border border-vanilla-200 shadow-sm space-y-3">
+                    <h2 class="font-serif text-base font-bold text-mocha-900">Riwayat Pesanan</h2>
+                    <div id="order-history-list" class="space-y-2.5">
+                        <div class="p-3 rounded-xl bg-vanilla-50 border border-vanilla-200 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-butter-200 text-mocha-900">Selesai</span>
+                                <p class="font-bold text-xs text-mocha-900 mt-1">Order #DB-9042</p>
+                                <p class="text-[11px] text-mocha-600">2x Caramel Croissant, 1x Mocha</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold text-xs text-caramel-600">Rp 118.000</p>
+                                <p class="text-[10px] text-mocha-500">20 Nov 2026</p>
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-vanilla-50 border border-vanilla-200 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-burgundy-100 text-burgundy-500">Selesai</span>
+                                <p class="font-bold text-xs text-mocha-900 mt-1">Order #DB-8819</p>
+                                <p class="text-[11px] text-mocha-600">1x Vanilla Mille Crepes</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold text-xs text-caramel-600">Rp 52.000</p>
+                                <p class="text-[10px] text-mocha-500">14 Nov 2026</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ==================== FLOATING ORDER BAR ("PESAN SEKARANG") ==================== -->
+        <div id="floating-order-bar" class="hidden absolute bottom-[68px] left-3 right-3 z-30 transition-all duration-300">
+            <button onclick="switchTab('checkout')" class="w-full bg-mocha-900 hover:bg-mocha-800 text-vanilla-50 p-3 rounded-2xl shadow-xl border border-caramel-500/40 flex items-center justify-between cursor-pointer group">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-butter-300 text-mocha-900 font-bold text-xs flex items-center justify-center shadow-sm" id="floating-cart-count">
+                        2
+                    </div>
+                    <div class="text-left">
+                        <p class="text-[10px] text-butter-200 font-medium">Total Estimasi</p>
+                        <p class="text-xs font-bold text-white" id="floating-cart-total">Rp 80.000</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 bg-caramel-500 group-hover:bg-caramel-400 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition">
+                    <span>Pesan Sekarang</span>
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </div>
+            </button>
+        </div>
+
+        <!-- ==================== MOBILE BOTTOM NAVIGATION BAR ==================== -->
+        <nav id="mobile-bottom-nav" class="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-vanilla-200 z-30 px-4 pt-2 pb-3 flex justify-around items-center shadow-[0_-4px_20px_rgba(41,27,19,0.06)]">
+            <button onclick="switchTab('home')" class="mobile-nav-btn flex flex-col items-center gap-1 p-1 text-mocha-900 font-bold cursor-pointer" data-target="home">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                <span class="text-[10px]">Beranda</span>
+            </button>
+            <button onclick="switchTab('menu')" class="mobile-nav-btn flex flex-col items-center gap-1 p-1 text-mocha-500 cursor-pointer" data-target="menu">
+                <i data-lucide="utensils" class="w-5 h-5"></i>
+                <span class="text-[10px]">Menu</span>
+            </button>
+            <button onclick="switchTab('profile')" class="mobile-nav-btn flex flex-col items-center gap-1 p-1 text-mocha-500 cursor-pointer" data-target="profile">
+                <i data-lucide="user" class="w-5 h-5"></i>
+                <span class="text-[10px]">Profil</span>
+            </button>
+        </nav>
+
+        <!-- Home Indicator Bar iOS/Android -->
+        <div id="mobile-home-indicator" class="absolute bottom-1 left-1/2 -translate-x-1/2 w-28 h-1 bg-mocha-900/30 rounded-full z-40 pointer-events-none"></div>
+
+    </div>
+
+    <!-- ==================== MODAL LOGIN & REGISTER ==================== -->
+    <div id="auth-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-mocha-900/60 backdrop-blur-sm p-4">
+        <div class="bg-vanilla-50 w-full max-w-[360px] rounded-3xl border border-butter-300 shadow-2xl overflow-hidden">
+            <!-- Header Modal -->
+            <div class="bg-gradient-to-r from-butter-200 to-burgundy-100 p-5 flex items-center justify-between border-b border-vanilla-200">
+                <div>
+                    <h3 class="font-serif text-xl font-bold text-mocha-900" id="auth-modal-title">Selamat Datang</h3>
+                    <p class="text-[11px] text-mocha-700 mt-0.5">Masuk atau daftar member Deliciousbite</p>
+                </div>
+                <button onclick="closeAuthModal()" class="p-1.5 rounded-xl bg-white/80 hover:bg-white text-mocha-800 cursor-pointer">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Tabs Switcher Login / Register -->
+            <div class="p-5 space-y-4">
+                <div class="grid grid-cols-2 gap-1.5 p-1 bg-vanilla-200/70 rounded-xl">
+                    <button id="tab-btn-login" onclick="switchAuthMode('login')" class="py-2 rounded-lg text-xs font-bold bg-mocha-800 text-butter-200 shadow transition cursor-pointer">Masuk</button>
+                    <button id="tab-btn-register" onclick="switchAuthMode('register')" class="py-2 rounded-lg text-xs font-bold text-mocha-700 transition cursor-pointer">Daftar Baru</button>
+                </div>
+
+                <form onsubmit="handleAuthSubmit(event)" class="space-y-3 text-xs">
+                    <div id="register-name-field" class="hidden">
+                        <label class="block text-[11px] font-semibold text-mocha-700 mb-1">Nama Lengkap</label>
+                        <input type="text" id="auth-name" placeholder="Contoh: Nadia Maharani" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-vanilla-200 focus:outline-none focus:border-caramel-500">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-mocha-700 mb-1">Alamat Email</label>
+                        <input type="email" id="auth-email" required placeholder="nama@email.com" value="nadia.maharani@email.com" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-vanilla-200 focus:outline-none focus:border-caramel-500">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-mocha-700 mb-1">Kata Sandi</label>
+                        <input type="password" required placeholder="••••••••" value="12345678" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-vanilla-200 focus:outline-none focus:border-caramel-500">
+                    </div>
+
+                    <button type="submit" id="auth-submit-btn" class="w-full bg-mocha-800 hover:bg-mocha-900 text-butter-200 font-bold py-3 rounded-xl shadow transition cursor-pointer mt-1">
+                        Masuk ke Akun
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== CUSTOM TOAST NOTIFICATION ==================== -->
+    <div id="toast-container" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-max max-w-[360px]"></div>
+
+    <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+    <script>
+        // Data Produk Deliciousbite
+        const menuItems = [
+            {
+                id: 1,
+                name: "Salted Caramel Butter Croissant",
+                category: "pastry",
+                price: 38000,
+                badge: "Best Seller",
+                badgeColor: "bg-butter-300 text-mocha-900",
+                desc: "Croissant berlapis mentega Prancis dengan lelehan saus karamel asin buatan sendiri.",
+                image: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80",
+                featured: true
+            },
+            {
+                id: 2,
+                name: "Velvet Burgundy Berry Tart",
+                category: "dessert",
+                price: 46000,
+                badge: "Chef Special",
+                badgeColor: "bg-burgundy-200 text-mocha-900",
+                desc: "Tart renyah dengan krim vanila lembut dan selai buah beri merah pastel yang segar.",
+                image: "https://images.unsplash.com/photo-1519915028121-7d3463d20b13?auto=format&fit=crop&w=600&q=80",
+                featured: true
+            },
+            {
+                id: 3,
+                name: "Iced Hazelnut Mocha Latte",
+                category: "drink",
+                price: 42000,
+                badge: "Signature",
+                badgeColor: "bg-mocha-800 text-butter-200",
+                desc: "Perpaduan espresso Arabika, cokelat mocha pekat, susu segar, dan sirup hazelnut panggang.",
+                image: "https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=600&q=80",
+                featured: true
+            },
+            {
+                id: 4,
+                name: "Madagascar Vanilla Mille Crepes",
+                category: "dessert",
+                price: 52000,
+                badge: "Favorit",
+                badgeColor: "bg-butter-200 text-mocha-900",
+                desc: "20 lapisan crepe tipis dengan krim diplomat biji vanila asli Madagaskar dan gula karamel.",
+                image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=600&q=80",
+                featured: false
+            },
+            {
+                id: 5,
+                name: "Cinnamon Butter Brioche Roll",
+                category: "pastry",
+                price: 35000,
+                badge: "Hangat",
+                badgeColor: "bg-caramel-400 text-white",
+                desc: "Roti brioche super lembut dengan taburan kayu manis dan glasir vanila manis.",
+                image: "https://images.unsplash.com/photo-1509365465985-25d11c17e812?auto=format&fit=crop&w=600&q=80",
+                featured: false
+            },
+            {
+                id: 6,
+                name: "Warm Caramel Macchiato",
+                category: "drink",
+                price: 39000,
+                badge: "Classic",
+                badgeColor: "bg-vanilla-200 text-mocha-900",
+                desc: "Susu steam berbusa lembut dengan sirup vanila, shot espresso, dan saus karamel.",
+                image: "https://images.unsplash.com/photo-1485808191679-5f86510681a2?auto=format&fit=crop&w=600&q=80",
+                featured: false
+            }
+        ];
+
+        // State Keranjang Belanja
+        let cart = [
+            { ...menuItems[0], qty: 1 },
+            { ...menuItems[2], qty: 1 }
+        ];
+
+        let currentAuthMode = 'login';
+        let isMobileSim = true; // Default langsung aktif tampilan HP
+
+        // Format Rupiah
+        function formatRupiah(angka) {
+            return 'Rp ' + angka.toLocaleString('id-ID');
+        }
+
+        // Render Kartu Menu (Dioptimalkan untuk layar HP: horizontal compact card)
+        function createMenuCard(item) {
+            return `
+                <div class="bg-white rounded-2xl overflow-hidden border border-vanilla-200 shadow-sm hover:shadow-md transition flex gap-3.5 p-3 items-center">
+                    <div class="relative w-24 h-24 rounded-xl overflow-hidden bg-vanilla-100 shrink-0">
+                        <img src="${item.image}" 
+                             onerror="this.src='https://placehold.co/300x300/FAF5EB/3D291E?text=${encodeURIComponent(item.name)}'" 
+                             alt="${item.name}" 
+                             class="w-full h-full object-cover">
+                        <span class="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md text-[9px] font-bold shadow-sm ${item.badgeColor}">
+                            ${item.badge}
+                        </span>
+                    </div>
+                    <div class="flex-1 min-w-0 flex flex-col justify-between h-full space-y-1.5">
+                        <div>
+                            <h3 class="font-serif text-sm font-bold text-mocha-900 leading-snug line-clamp-1">${item.name}</h3>
+                            <p class="text-[11px] text-mocha-600 line-clamp-2 leading-relaxed mt-0.5">${item.desc}</p>
+                        </div>
+                        <div class="flex items-center justify-between pt-1">
+                            <span class="font-bold text-xs text-caramel-600">${formatRupiah(item.price)}</span>
+                            <button onclick="addToCart(${item.id})" class="bg-butter-200 hover:bg-butter-300 text-mocha-900 font-bold text-[11px] px-3 py-1.5 rounded-lg transition flex items-center gap-1 cursor-pointer">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                <span>Tambah</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render Menu di Beranda & Halaman Menu
+        function renderMenus(filter = 'all') {
+            const featuredGrid = document.getElementById('featured-menu-grid');
+            const allGrid = document.getElementById('all-menu-grid');
+
+            featuredGrid.innerHTML = menuItems
+                .filter(item => item.featured)
+                .map(createMenuCard)
+                .join('');
+
+            const filteredItems = filter === 'all' 
+                ? menuItems 
+                : menuItems.filter(item => item.category === filter);
+
+            allGrid.innerHTML = filteredItems.map(createMenuCard).join('');
+            lucide.createIcons();
+        }
+
+        // Filter Kategori Menu
+        function filterMenu(category, btnElement) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-mocha-800', 'text-butter-200');
+                btn.classList.add('bg-white', 'text-mocha-700');
+            });
+            if (btnElement) {
+                btnElement.classList.remove('bg-white', 'text-mocha-700');
+                btnElement.classList.add('bg-mocha-800', 'text-butter-200');
+            }
+            renderMenus(category);
+        }
+
+        // Navigasi Antar Halaman (SPA)
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.dataset.target === tabName) {
+                    link.classList.add('text-mocha-900', 'font-bold', 'border-b-2', 'border-caramel-500');
+                } else {
+                    link.classList.remove('text-mocha-900', 'font-bold', 'border-b-2', 'border-caramel-500');
+                }
+            });
+
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                if (btn.dataset.target === tabName) {
+                    btn.classList.remove('text-mocha-500');
+                    btn.classList.add('text-mocha-900', 'font-bold');
+                } else {
+                    btn.classList.add('text-mocha-500');
+                    btn.classList.remove('text-mocha-900', 'font-bold');
+                }
+            });
+
+            updateFloatingOrderBar(tabName);
+
+            const scrollArea = document.getElementById('mobile-scroll-area');
+            if (scrollArea) scrollArea.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Atur visibilitas bilah melayang "Pesan Sekarang" di bagian bawah layar
+        function updateFloatingOrderBar(activeTab) {
+            const bar = document.getElementById('floating-order-bar');
+            if (!bar) return;
+
+            const currentTab = activeTab || Array.from(document.querySelectorAll('.tab-content'))
+                .find(el => !el.classList.contains('hidden'))?.id.replace('tab-', '');
+
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+
+            if (totalItems > 0 && currentTab !== 'checkout') {
+                bar.classList.remove('hidden');
+            } else {
+                bar.classList.add('hidden');
+            }
+        }
+
+        // Tambah ke Keranjang
+        function addToCart(id) {
+            const product = menuItems.find(item => item.id === id);
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+            updateCartUI();
+            showToast(`"${product.name}" masuk keranjang!`);
+        }
+
+        // Ubah Kuantitas Keranjang
+        function updateQty(id, delta) {
+            const index = cart.findIndex(item => item.id === id);
+            if (index !== -1) {
+                cart[index].qty += delta;
+                if (cart[index].qty <= 0) {
+                    cart.splice(index, 1);
+                }
+            }
+            updateCartUI();
+        }
+
+        // Perbarui Tampilan Keranjang & Ringkasan Harga
+        function updateCartUI() {
+            const badge = document.getElementById('cart-badge');
+            const container = document.getElementById('cart-items-container');
+            const floatingCount = document.getElementById('floating-cart-count');
+            const floatingTotal = document.getElementById('floating-cart-total');
+            
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+            badge.textContent = totalItems;
+            if (floatingCount) floatingCount.textContent = `${totalItems}x`;
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-6 space-y-2">
+                        <p class="text-xs text-mocha-600">Keranjang pesanan Anda masih kosong.</p>
+                        <button onclick="switchTab('menu')" class="text-xs font-bold text-caramel-600 underline cursor-pointer">Pilih Menu Sekarang</button>
+                    </div>
+                `;
+                document.getElementById('summary-subtotal').textContent = 'Rp 0';
+                document.getElementById('summary-total').textContent = 'Rp 0';
+                if (floatingTotal) floatingTotal.textContent = 'Rp 0';
+                updateFloatingOrderBar();
+                return;
+            }
+
+            container.innerHTML = cart.map(item => `
+                <div class="flex items-center justify-between gap-2.5 p-2.5 rounded-xl bg-vanilla-50 border border-vanilla-200">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <img src="${item.image}" alt="${item.name}" class="w-12 h-12 rounded-lg object-cover shrink-0">
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-xs text-mocha-900 truncate">${item.name}</h4>
+                            <p class="text-[11px] font-semibold text-caramel-600">${formatRupiah(item.price)}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5 bg-white px-2 py-1 rounded-lg border border-vanilla-200 shrink-0">
+                        <button onclick="updateQty(${item.id}, -1)" class="w-5 h-5 rounded bg-vanilla-100 hover:bg-butter-200 font-bold text-xs text-mocha-900 flex items-center justify-center cursor-pointer">-</button>
+                        <span class="text-xs font-bold w-4 text-center">${item.qty}</span>
+                        <button onclick="updateQty(${item.id}, 1)" class="w-5 h-5 rounded bg-vanilla-100 hover:bg-butter-200 font-bold text-xs text-mocha-900 flex items-center justify-center cursor-pointer">+</button>
+                    </div>
+                </div>
+            `).join('');
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const shipping = 12000;
+            const discount = subtotal >= 50000 ? 10000 : 0;
+            const total = subtotal + shipping - discount;
+
+            document.getElementById('summary-subtotal').textContent = formatRupiah(subtotal);
+            document.getElementById('summary-discount').textContent = `- ${formatRupiah(discount)}`;
+            document.getElementById('summary-total').textContent = formatRupiah(total);
+            if (floatingTotal) floatingTotal.textContent = formatRupiah(subtotal);
+
+            updateFloatingOrderBar();
+        }
+
+        // Proses Pembayaran Simulasi
+        function processPayment() {
+            if (cart.length === 0) {
+                showToast("Keranjang masih kosong. Pilih menu dulu.");
+                return;
+            }
+            const method = document.querySelector('input[name="payment_method"]:checked').value;
+            const totalText = document.getElementById('summary-total').textContent;
+            const orderId = 'DB-' + Math.floor(1000 + Math.random() * 9000);
+
+            const historyList = document.getElementById('order-history-list');
+            const summaryNames = cart.map(i => `${i.qty}x ${i.name}`).join(', ');
+            const newHistory = `
+                <div class="p-3 rounded-xl bg-butter-100/70 border border-butter-300 flex items-center justify-between">
+                    <div class="min-w-0 pr-2">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-mocha-800 text-butter-200">Diproses (${method})</span>
+                        <p class="font-bold text-xs text-mocha-900 mt-1">Order #${orderId}</p>
+                        <p class="text-[11px] text-mocha-700 truncate">${summaryNames}</p>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <p class="font-bold text-xs text-caramel-600">${totalText}</p>
+                        <p class="text-[10px] text-mocha-600">Baru saja</p>
+                    </div>
+                </div>
+            `;
+            historyList.insertAdjacentHTML('afterbegin', newHistory);
+
+            cart = [];
+            updateCartUI();
+            showToast(`Pembayaran ${totalText} via ${method} berhasil!`);
+            switchTab('profile');
+        }
+
+        // Modal Login & Register Logic
+        function openAuthModal(mode = 'login') {
+            switchAuthMode(mode);
+            const modal = document.getElementById('auth-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('auth-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function switchAuthMode(mode) {
+            currentAuthMode = mode;
+            const nameField = document.getElementById('register-name-field');
+            const btnLogin = document.getElementById('tab-btn-login');
+            const btnReg = document.getElementById('tab-btn-register');
+            const submitBtn = document.getElementById('auth-submit-btn');
+
+            if (mode === 'register') {
+                nameField.classList.remove('hidden');
+                btnReg.classList.add('bg-mocha-800', 'text-butter-200', 'shadow');
+                btnReg.classList.remove('text-mocha-700');
+                btnLogin.classList.remove('bg-mocha-800', 'text-butter-200', 'shadow');
+                btnLogin.classList.add('text-mocha-700');
+                submitBtn.textContent = "Daftar Sekarang";
+            } else {
+                nameField.classList.add('hidden');
+                btnLogin.classList.add('bg-mocha-800', 'text-butter-200', 'shadow');
+                btnLogin.classList.remove('text-mocha-700');
+                btnReg.classList.remove('bg-mocha-800', 'text-butter-200', 'shadow');
+                btnReg.classList.add('text-mocha-700');
+                submitBtn.textContent = "Masuk ke Akun";
+            }
+        }
+
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const nameInput = document.getElementById('auth-name').value;
+            const displayName = (currentAuthMode === 'register' && nameInput) ? nameInput : "Nadia Maharani";
+
+            document.getElementById('auth-header-text').textContent = displayName.split(' ')[0];
+            document.getElementById('profile-display-name').textContent = displayName;
+            document.getElementById('profile-display-email').textContent = email;
+            document.getElementById('profile-input-name').value = displayName;
+            document.getElementById('profile-input-email').value = email;
+
+            closeAuthModal();
+            showToast(`Selamat datang, ${displayName}!`);
+        }
+
+        function saveProfile() {
+            const newName = document.getElementById('profile-input-name').value;
+            const newEmail = document.getElementById('profile-input-email').value;
+            document.getElementById('profile-display-name').textContent = newName;
+            document.getElementById('profile-display-email').textContent = newEmail;
+            document.getElementById('auth-header-text').textContent = newName.split(' ')[0];
+            showToast("Profil berhasil diperbarui!");
+        }
+
+        // Toggle antara Tampilan Handphone (Default) dan Layar Penuh Desktop
+        function toggleMobileSimulation() {
+            const wrapper = document.getElementById('app-wrapper');
+            const btn = document.getElementById('btn-mobile-sim');
+            const statusBar = document.getElementById('mobile-status-bar');
+            const homeIndicator = document.getElementById('mobile-home-indicator');
+            const desktopNav = document.getElementById('desktop-nav-links');
+            const bottomNav = document.getElementById('mobile-bottom-nav');
+            const featuredGrid = document.getElementById('featured-menu-grid');
+            const allGrid = document.getElementById('all-menu-grid');
+            const checkoutGrid = document.getElementById('checkout-layout-grid');
+
+            isMobileSim = !isMobileSim;
+
+            if (isMobileSim) {
+                wrapper.className = "transition-all duration-300 mx-auto w-full max-w-[412px] sm:my-6 sm:rounded-[44px] sm:border-[12px] sm:border-mocha-900 sm:shadow-2xl bg-vanilla-50 relative flex flex-col h-[calc(100vh-44px)] sm:h-[820px] overflow-hidden";
+                statusBar.classList.remove('hidden');
+                homeIndicator.classList.remove('hidden');
+                desktopNav.classList.add('hidden');
+                desktopNav.classList.remove('flex');
+                bottomNav.classList.remove('hidden');
+                featuredGrid.className = "grid grid-cols-1 gap-4";
+                allGrid.className = "grid grid-cols-1 gap-4";
+                checkoutGrid.className = "grid grid-cols-1 gap-5";
+                btn.innerHTML = `<i data-lucide="monitor" class="w-4 h-4"></i><span>Buka Layar Penuh Desktop</span>`;
+                showToast("Tampilan Layar Handphone diaktifkan");
+            } else {
+                wrapper.className = "transition-all duration-300 mx-auto w-full max-w-6xl bg-vanilla-50 relative flex flex-col min-h-[calc(100vh-44px)] shadow-lg";
+                statusBar.classList.add('hidden');
+                homeIndicator.classList.add('hidden');
+                desktopNav.classList.remove('hidden');
+                desktopNav.classList.add('flex');
+                bottomNav.classList.add('hidden');
+                featuredGrid.className = "grid grid-cols-1 md:grid-cols-3 gap-5";
+                allGrid.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5";
+                checkoutGrid.className = "grid grid-cols-1 lg:grid-cols-2 gap-8";
+                btn.innerHTML = `<i data-lucide="smartphone" class="w-4 h-4"></i><span>Kembali ke Layar HP</span>`;
+                showToast("Tampilan Layar Penuh Desktop diaktifkan");
+            }
+            lucide.createIcons();
+        }
+
+        // Toast Notification Helper
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = "bg-mocha-900 text-butter-200 text-xs font-medium px-4 py-2.5 rounded-2xl shadow-xl border border-mocha-700 flex items-center gap-2 transition-all duration-300";
+            toast.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 text-butter-400 shrink-0"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 2800);
+        }
+
+        // ==================== EXPORT DOKUMEN KE MICROSOFT WORD (.DOC) ====================
+        function exportToWord() {
+            const docContent = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head><meta charset='utf-8'><title>Spesifikasi Prototipe Mobile Web Deliciousbite</title>
+                <style>
+                    body { font-family: 'Calibri', sans-serif; color: #291B13; line-height: 1.5; }
+                    h1 { color: #3D291E; border-bottom: 2px solid #C4823B; padding-bottom: 6px; }
+                    h2 { color: #9A5B66; margin-top: 20px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                    th, td { border: 1px solid #D69A54; padding: 8px; text-align: left; }
+                    th { background-color: #FDE9A2; color: #3D291E; }
+                </style>
+                </head>
+                <body>
+                    <h1>DOKUMENTASI PROTOTIPE MOBILE WEB: DELICIOUSBITE</h1>
+                    <p><strong>Versi Prototipe:</strong> 1.0 (Mobile-First App UI)<br>
+                    <strong>Konsep Brand:</strong> Artisanal Bakery, Pastry & Specialty Coffee</p>
+
+                    <h2>1. Palet Warna (Brand Color System)</h2>
+                    <table>
+                        <tr><th>Nama Warna</th><th>Kode HEX</th><th>Penggunaan dalam UI</th></tr>
+                        <tr><td>Butter Yellow</td><td>#FDE9A2 / #F9DC78</td><td>Aksen tombol utama, highlight kartu promo, badge produk</td></tr>
+                        <tr><td>Vanilla Cream</td><td>#FDFBF7 / #FAF5EB</td><td>Latar belakang utama (background) yang hangat dan bersih</td></tr>
+                        <tr><td>Caramel Gold</td><td>#C4823B / #D69A54</td><td>Harga produk, garis aksen aktif, tombol sekunder</td></tr>
+                        <tr><td>Mocha Espresso</td><td>#3D291E / #291B13</td><td>Tipografi utama, bingkai ponsel, tombol aksi primer</td></tr>
+                        <tr><td>Pastel Soft Burgundy</td><td>#E5C6CB / #9A5B66</td><td>Badge spesial, indikator diskon, aksen elegan</td></tr>
+                    </table>
+
+                    <h2>2. Arsitektur Halaman Mobile App</h2>
+                    <ul>
+                        <li><strong>Halaman Beranda (Home):</strong> Hero banner seluler, keunggulan produk, dan rekomendasi menu terlaris.</li>
+                        <li><strong>Halaman Menu & Harga:</strong> Katalog kartu horizontal yang nyaman digulir dengan satu tangan beserta filter kategori.</li>
+                        <li><strong>Halaman Pembayaran (Checkout):</strong> Pengelolaan kuantitas keranjang secara real-time, formulir alamat pengiriman, pilihan metode pembayaran (QRIS, Virtual Account, Kartu Kredit), serta kalkulasi otomatis diskon.</li>
+                        <li><strong>Halaman Profil Pengguna:</strong> Kartu keanggotaan (Gold Butter Member), poin loyalti, pengaturan informasi akun, dan riwayat transaksi.</li>
+                        <li><strong>Autentikasi (Masuk & Daftar):</strong> Modal pop-up responsif untuk perpindahan cepat antara formulir Login dan Registrasi pengguna baru.</li>
+                    </ul>
+
+                    <h2>3. Daftar Menu & Harga Awal</h2>
+                    <table>
+                        <tr><th>Nama Menu</th><th>Kategori</th><th>Harga</th><th>Deskripsi</th></tr>
+                        ${menuItems.map(m => `<tr><td>${m.name}</td><td>${m.category.toUpperCase()}</td><td>${formatRupiah(m.price)}</td><td>${m.desc}</td></tr>`).join('')}
+                    </table>
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob(['\ufeff', docContent], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Spesifikasi_Mobile_Deliciousbite.doc';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showToast("File Word (Spesifikasi_Mobile_Deliciousbite.doc) berhasil diunduh!");
+        }
+
+        // Inisialisasi saat halaman dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            renderMenus();
+            updateCartUI();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
